@@ -79,7 +79,9 @@ h1{font-size:42px}
 <a href="#about">About</a>
 </nav>
 
-<button class="btn" onclick="openAuth()">Login</button>
+<div id="userArea">
+  <button class="btn" onclick="openAuth()">Login</button>
+</div>
 </div>
 </header>
 
@@ -293,11 +295,66 @@ return;
 localStorage.setItem("gamearena_current_user",JSON.stringify(user));
 
 closeAuth();
-toast("Welcome "+user.name+" 🎮");
+updateUserArea();
+  toast("Welcome "+user.name+" 🎮");
 }
+}
+function updateUserArea(){
+  const user = localStorage.getItem("gamearena_current_user");
+
+  if(!user) return;
+
+  const data = JSON.parse(user);
+
+  const loginBtn = document.querySelector(
+    'button[onclick="openAuth()"]'
+  );
+
+  if(loginBtn){
+    loginBtn.textContent = "👤 " + data.name;
+    loginBtn.onclick = function(){
+    showProfile();  
+    };
+  }
+}
+function showProfile(){
+  const user = localStorage.getItem("gamearena_current_user");
+
+  if(!user){
+    openAuth();
+    return;
+  }
+
+  const data = JSON.parse(user);
+
+  const regs = JSON.parse(
+    localStorage.getItem("gamearena_regs") || "[]"
+  );
+
+  let tournaments = regs.length
+    ? regs.join("\n• ")
+    : "No tournaments registered yet.";
+
+  const choice = confirm(
+    "👤 PROFILE\n\n" +
+    "Username: " + data.name + "\n" +
+    "Email: " + data.email + "\n\n" +
+    "🏆 Registered Tournaments: " + regs.length +
+    "\n\n• " + tournaments +
+    "\n\nOK = Logout\nCancel = Close"
+  );
+
+  if(choice){
+    logoutUser();
+  }
 }
 
-function register(name){
+function logoutUser(){
+  localStorage.removeItem("gamearena_current_user");
+  updateUserArea();
+  toast("Logged out successfully 👋");
+}
+  function register(name){
 
 if(!localStorage.getItem("gamearena_current_user")){
 toast("Please login first");
@@ -312,7 +369,36 @@ if(!list.includes(name))list.push(name);
 localStorage.setItem("gamearena_regs",JSON.stringify(list));
 
 toast("Registered for "+name+" 🎮");
+
+
+  const area = document.getElementById("userArea");
+  const saved = localStorage.getItem("gamearena_current_user");
+
+  if(!saved){
+    area.innerHTML =
+      '<button class="btn" onclick="openAuth()">Login</button>';
+    return;
+  }
+
+  const user = JSON.parse(saved);
+
+  area.innerHTML =
+    '<span style="margin-right:10px;color:#aab4cf">👤 ' +
+    user.name +
+    '</span>' +
+    '<button class="btn" onclick="logout()">Logout</button>';
 }
+
+function logout(){
+
+  localStorage.removeItem("gamearena_current_user");
+
+  updateUserArea();
+
+  toast("Logged out successfully");
+}
+
+updateUserArea();
 </script>
 
 </body>
