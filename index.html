@@ -327,25 +327,35 @@ function showProfile(){
 
   const data = JSON.parse(user);
 
-  const regs = JSON.parse(
-    localStorage.getItem("gamearena_regs") || "[]"
+  const registrations = JSON.parse(
+    localStorage.getItem("gamearena_registrations") || "[]"
   );
 
-  let tournaments = regs.length
-    ? regs.join("\n• ")
+  const myRegistrations = registrations.filter(
+    r => r.email === data.email
+  );
+
+  let tournaments = myRegistrations.length
+    ? myRegistrations.map(
+        r => "• " + r.tournament + " (" + r.mode + ")"
+      ).join("\n")
     : "No tournaments registered yet.";
 
   const choice = confirm(
     "👤 PROFILE\n\n" +
     "Username: " + data.name + "\n" +
     "Email: " + data.email + "\n\n" +
-    "🏆 Registered Tournaments: " + regs.length +
-    "\n\n• " + tournaments +
+    "🏆 Registered Tournaments: " +
+    myRegistrations.length +
+    "\n\n" +
+    tournaments +
     "\n\nOK = Logout\nCancel = Close"
   );
 
   if(choice){
     logoutUser();
+  }
+}
   }
 }
 
