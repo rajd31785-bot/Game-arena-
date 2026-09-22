@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020"><title>GameArena — Gaming Hub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070b16;color:#f7f8ff;font-family:Inter,Arial,sans-serif}
+a{text-decoration:none;color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 20px}
+header{position:sticky;top:0;z-index:5;background:#0b1020ee;backdrop-filter:blur(12px);border-bottom:1px solid #202a45}
+.nav{height:68px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:25px;font-weight:900}.brand span{color:#7280ff}
+.links{display:flex;gap:24px;color:#b9c3dd;font-size:14px}.links a:hover{color:#fff}
+.hero{padding:75px 0 55px;display:grid;grid-template-columns:1.25fr .75fr;gap:35px;align-items:center}
+.kicker{color:#8d9aff;font-weight:800;text-transform:uppercase;letter-spacing:2px;font-size:12px}
+h1{font-size:56px;line-height:1.02;margin:12px 0}.hero p{color:#aeb8d2;font-size:17px;line-height:1.6;max-width:650px}
+.btn{display:inline-block;background:#6674ff;color:white;border:0;border-radius:12px;padding:13px 18px;font-weight:800;cursor:pointer}.btn.alt{background:#1a2440;margin-left:8px}
+.hero-card{background:linear-gradient(145deg,#171f42,#10162b);border:1px solid #2a365a;border-radius:24px;padding:25px;box-shadow:0 20px 60px #0005}
+.hero-card .big{font-size:42px}.muted{color:#aab4cf;font-size:13px}
+section{padding:30px 0 65px}h2{font-size:28px;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.card{background:#111a30;border:1px solid #25304e;border-radius:17px;padding:20px}.tag{color:#91a0ff;font-size:11px;font-weight:800}.card h3{margin:8px 0}.card p{color:#aab4cf;font-size:13px;line-height:1.5}.meta{display:flex;justify-content:space-between;color:#8995b3;font-size:12px;margin:14px 0}
+table{width:100%;border-collapse:collapse;background:#111a30;border:1px solid #25304e;border-radius:15px;overflow:hidden}th,td{text-align:left;padding:15px;border-bottom:1px solid #202b48;font-size:13px}th{color:#8e9bff}td{color:#d9def0}
+.cta{text-align:center;background:linear-gradient(135deg,#151f43,#241342);border:1px solid #313c63;border-radius:24px;padding:40px}.cta p{color:#b5bfd8}
+footer{border-top:1px solid #202a45;padding:25px 0;color:#7f8ba8;font-size:12px}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#202b48;color:white;padding:12px 18px;border-radius:12px;display:none}
+@media(max-width:800px){.links{display:none}.hero{grid-template-columns:1fr;padding-top:45px}h1{font-size:42px}.grid{grid-template-columns:1fr}.wrap{padding:0 15px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><div class="brand">Game<span>Arena</span> 🎮</div><nav class="links"><a href="#games">Games</a><a href="#tournaments">Tournaments</a><a href="#leaderboard">Leaderboard</a><a href="#about">About</a></nav><button class="btn" onclick="toast('Login system will be connected with Firebase in the next build.')">Login</button></div></header>
+
+<main class="wrap">
+<section class="hero">
+<div><div class="kicker">India Gaming Community</div><h1>Play. Compete.<br><span style="color:#7280ff">Level Up.</span></h1><p>GameArena is a gaming tournament hub for players, teams and esports communities. Discover matches, register for free tournaments and track your leaderboard progress.</p><a class="btn" href="#tournaments">Explore Tournaments</a><a class="btn alt" href="#games">Explore Games</a></div>
+<div class="hero-card"><div class="big">🏆</div><h2>Weekend Battle</h2><div class="muted">BGMI • Free Entry • 100 Slots</div><div class="meta"><span>Sunday 7:30 PM</span><span>Open</span></div><button class="btn" onclick="register('Weekend Battle')">Register Free</button></div>
+</section>
+
+<section id="games"><h2>🎮 Popular Games</h2><div class="grid">
+<div class="card"><div class="tag">BATTLE ROYALE</div><h3>BGMI</h3><p>Solo, duo and squad tournament events.</p><button class="btn" onclick="toast('BGMI tournaments selected')">View Events</button></div>
+<div class="card"><div class="tag">ESPORTS</div><h3>Valorant</h3><p>Team-based competitive events and leaderboards.</p><button class="btn" onclick="toast('Valorant events selected')">View Events</button></div>
+<div class="card"><div class="tag">COMMUNITY</div><h3>More Games</h3><p>Build your gaming community around the titles you play.</p><button class="btn" onclick="toast('More games coming soon')">Coming Soon</button></div>
+</div></section>
+
+<section id="tournaments"><h2>🏆 Upcoming Tournaments</h2><div class="grid">
+<div class="card"><div class="tag">BGMI • SOLO</div><h3>GameArena Clash #01</h3><p>Fast-paced solo competition.</p><div class="meta"><span>Today • 8 PM</span><span>100 slots</span></div><button class="btn" onclick="register('GameArena Clash #01')">Register</button></div>
+<div class="card"><div class="tag">BGMI • SQUAD</div><h3>Night Squad Cup</h3><p>Build your squad and compete.</p><div class="meta"><span>Tomorrow • 9 PM</span><span>25 teams</span></div><button class="btn" onclick="register('Night Squad Cup')">Register</button></div>
+<div class="card"><div class="tag">BGMI • OPEN</div><h3>Weekend Battle</h3><p>Community weekend event.</p><div class="meta"><span>Sun • 7:30 PM</span><span>50 slots</span></div><button class="btn" onclick="register('Weekend Battle')">Register</button></div>
+</div></section>
+
+<section id="leaderboard"><h2>📊 Season Leaderboard</h2><table><tr><th>#</th><th>Player</th><th>Matches</th><th>Wins</th><th>Points</th></tr>
+<tr><td>1</td><td>ShadowX</td><td>18</td><td>9</td><td>980</td></tr><tr><td>2</td><td>Alpha07</td><td>17</td><td>8</td><td>920</td></tr><tr><td>3</td><td>RajPlayz</td><td>12</td><td>7</td><td>870</td></tr><tr><td>4</td><td>HunterOP</td><td>15</td><td>6</td><td>810</td></tr></table></section>
+
+<section id="about"><div class="cta"><h2>Build your gaming community</h2><p>Start with free tournaments, community events and sponsorship opportunities. Add accounts, live results and an admin dashboard as the platform grows.</p><button class="btn" onclick="toast('Welcome to GameArena!')">Join GameArena</button></div></section>
+</main>
+<footer><div class="wrap">© 2026 GameArena • Gaming community platform • Free-entry tournament demo</div></footer>
+<div id="toast"></div>
+<script>
+function toast(t){let x=document.getElementById('toast');x.textContent=t;x.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>x.style.display='none',2600)}
+function register(n){let a=JSON.parse(localStorage.getItem('gamearena_regs')||'[]');if(!a.includes(n))a.push(n);localStorage.setItem('gamearena_regs',JSON.stringify(a));toast('Registered for '+n+' (demo)')}
+</script>
+</body></html>
