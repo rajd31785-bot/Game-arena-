@@ -399,7 +399,101 @@ function logout(){
 }
 
 updateUserArea();
-</script>
+function register(name){
+  const user = localStorage.getItem("gamearena_current_user");
 
+  if(!user){
+    toast("Please login first");
+    openAuth();
+    return;
+  }
+
+  document.getElementById("regTitle").textContent =
+    "Register: " + name;
+
+  document.getElementById("regModal").dataset.tournament = name;
+
+  document.getElementById("regModal").style.display = "flex";
+}
+
+function closeReg(){
+  document.getElementById("regModal").style.display = "none";
+}
+
+function submitRegistration(){
+
+  const playerName =
+    document.getElementById("playerName").value.trim();
+
+  const playerUid =
+    document.getElementById("playerUid").value.trim();
+
+  const mode =
+    document.getElementById("playerMode").value;
+
+  const tournament =
+    document.getElementById("regModal").dataset.tournament;
+
+  if(!playerName || !playerUid || !mode){
+    toast("Please fill all details");
+    return;
+  }
+
+  let registrations = JSON.parse(
+    localStorage.getItem("gamearena_registrations") || "[]"
+  );
+
+  const user = JSON.parse(
+    localStorage.getItem("gamearena_current_user")
+  );
+
+  registrations.push({
+    tournament: tournament,
+    username: user.name,
+    email: user.email,
+    playerName: playerName,
+    uid: playerUid,
+    mode: mode,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem(
+    "gamearena_registrations",
+    JSON.stringify(registrations)
+  );
+
+  closeReg();
+
+  document.getElementById("playerName").value = "";
+  document.getElementById("playerUid").value = "";
+  document.getElementById("playerMode").value = "";
+
+  toast("Registration successful 🎉");
+}
+</script>
+<div class="modal" id="regModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeReg()">×</button>
+
+    <h2 id="regTitle">Tournament Registration</h2>
+
+    <input class="input" id="playerName"
+      placeholder="BGMI In-Game Name">
+
+    <input class="input" id="playerUid"
+      placeholder="BGMI UID">
+
+    <select class="input" id="playerMode">
+      <option value="">Select Mode</option>
+      <option value="Solo">Solo</option>
+      <option value="Squad">Squad</option>
+    </select>
+
+    <button class="btn" style="width:100%"
+      onclick="submitRegistration()">
+      Confirm Registration
+    </button>
+  </div>
+</div>
 </body>
 </html>
