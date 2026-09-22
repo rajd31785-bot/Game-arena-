@@ -22,10 +22,16 @@ table{width:100%;border-collapse:collapse;background:#111a30;border:1px solid #2
 footer{border-top:1px solid #202a45;padding:25px 0;color:#7f8ba8;font-size:12px}
 #toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#202b48;color:white;padding:12px 18px;border-radius:12px;display:none}
 @media(max-width:800px){.links{display:none}.hero{grid-template-columns:1fr;padding-top:45px}h1{font-size:42px}.grid{grid-template-columns:1fr}.wrap{padding:0 15px}}
-</style>
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-box{width:100%;max-width:400px;background:#111a30;border:1px solid #303d65;border-radius:20px;padding:25px;box-shadow:0 20px 80px #0008}
+.modal-box h2{margin:0 0 20px}
+.input{width:100%;padding:14px;margin-bottom:12px;border-radius:10px;border:1px solid #303d65;background:#080e1d;color:white;font-size:15px;outline:none}
+.close{float:right;background:none;border:0;color:#aab4cf;font-size:25px;cursor:pointer}
+.switch{text-align:center;color:#aab4cf;font-size:13px;margin-top:15px}
+.switch span{color:#7280ff;cursor:pointer;font-weight:700}</style>
 </head>
 <body>
-<header><div class="wrap nav"><div class="brand">Game<span>Arena</span> 🎮</div><nav class="links"><a href="#games">Games</a><a href="#tournaments">Tournaments</a><a href="#leaderboard">Leaderboard</a><a href="#about">About</a></nav><button class="btn" onclick="toast('Login system will be connected with Firebase in the next build.')">Login</button></div></header>
+<header><div class="wrap nav"><div class="brand">Game<span>Arena</span> 🎮</div><nav class="links"><a href="#games">Games</a><a href="#tournaments">Tournaments</a><a href="#leaderboard">Leaderboard</a><a href="#about">About</a></nav><<button class="btn" onclick="openAuth()">Login</button>
 
 <main class="wrap">
 <section class="hero">
@@ -51,9 +57,157 @@ footer{border-top:1px solid #202a45;padding:25px 0;color:#7f8ba8;font-size:12px}
 <section id="about"><div class="cta"><h2>Build your gaming community</h2><p>Start with free tournaments, community events and sponsorship opportunities. Add accounts, live results and an admin dashboard as the platform grows.</p><button class="btn" onclick="toast('Welcome to GameArena!')">Join GameArena</button></div></section>
 </main>
 <footer><div class="wrap">© 2026 GameArena • Gaming community platform • Free-entry tournament demo</div></footer>
-<div id="toast"></div>
+<div id="toast"><
 <script>
-function toast(t){let x=document.getElementById('toast');x.textContent=t;x.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>x.style.display='none',2600)}
-function register(n){let a=JSON.parse(localStorage.getItem('gamearena_regs')||'[]');if(!a.includes(n))a.push(n);localStorage.setItem('gamearena_regs',JSON.stringify(a));toast('Registered for '+n+' (demo)')}
+let signupMode=false;
+
+function toast(t){
+  let x=document.getElementById('toast');
+  x.textContent=t;
+  x.style.display='block';
+  clearTimeout(window.tt);
+  window.tt=setTimeout(()=>{
+    x.style.display='none';
+  },2600);
+}
+
+function openAuth(){
+  document.getElementById('authModal').style.display='flex';
+}
+
+function closeAuth(){
+  document.getElementById('authModal').style.display='none';
+}
+
+function toggleAuth(){
+  signupMode=!signupMode;
+
+  document.getElementById('authTitle').textContent=
+    signupMode ? 'Create GameArena Account' : 'Login to GameArena';
+
+  document.getElementById('authBtn').textContent=
+    signupMode ? 'Create Account' : 'Login';
+
+  document.getElementById('authName').style.display=
+    signupMode ? 'block' : 'none';
+
+  document.getElementById('switchText').textContent=
+    signupMode ? 'Already have an account? ' : "Don't have an account? ";
+
+  document.getElementById('switchBtn').textContent=
+    signupMode ? 'Login' : 'Sign Up';
+}
+
+function submitAuth(){
+  const name=document.getElementById('authName').value.trim();
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+
+  if(!email || !password || (signupMode && !name)){
+    toast('Please fill all details');
+    return;
+  }
+
+  let users=JSON.parse(
+    localStorage.getItem('gamearena_users') || '[]'
+  );
+
+  if(signupMode){
+
+    if(users.some(u=>u.email===email)){
+      toast('Account already exists');
+      return;
+    }
+
+    users.push({
+      name:name,
+      email:email,
+      password:password
+    });
+
+    localStorage.setItem(
+      'gamearena_users',
+      JSON.stringify(users)
+    );
+
+    toast('Account created successfully 🎉');
+
+    setTimeout(()=>{
+      signupMode=false;
+      document.getElementById('authName').style.display='none';
+      document.getElementById('authTitle').textContent='Login to GameArena';
+      document.getElementById('authBtn').textContent='Login';
+      document.getElementById('switchText').textContent="Don't have an account? ";
+      document.getElementById('switchBtn').textContent='Sign Up';
+    },800);
+
+  }else{
+
+    const user=users.find(
+      u=>u.email===email && u.password===password
+    );
+
+    if(!user){
+      toast('Invalid email or password');
+      return;
+    }
+
+    localStorage.setItem(
+      'gamearena_current_user',
+      JSON.stringify(user)
+    );
+
+    closeAuth();
+    toast('Welcome '+user.name+' 🎮');
+  }
+}
+
+function register(n){
+  const user=localStorage.getItem('gamearena_current_user');
+
+  if(!user){
+    toast('Please login first');
+    openAuth();
+    return;
+  }
+
+  let a=JSON.parse(
+    localStorage.getItem('gamearena_regs') || '[]'
+  );
+
+  if(!a.includes(n)) a.push(n);
+
+  localStorage.setItem(
+    'gamearena_regs',
+    JSON.stringify(a)
+  );
+
+  toast('Registered for '+n+' 🎮');
+}
 </script>
-</body></html>
+<div class="modal" id="authModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeAuth()">×</button>
+
+    <h2 id="authTitle">Login to GameArena</h2>
+
+    <input class="input" id="authName"
+      placeholder="Username" style="display:none">
+
+    <input class="input" id="authEmail"
+      type="email" placeholder="Email">
+
+    <input class="input" id="authPassword"
+      type="password" placeholder="Password">
+
+    <button class="btn" style="width:100%"
+      onclick="submitAuth()" id="authBtn">
+      Login
+    </button>
+
+    <div class="switch">
+      <span id="switchText">Don't have an account? </span>
+      <span onclick="toggleAuth()" id="switchBtn">Sign Up</span>
+    </div>
+  </div>
+</div></html>
