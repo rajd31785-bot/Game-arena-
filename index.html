@@ -214,126 +214,193 @@ h1{font-size:42px}
 
 </div>
 </div>
-
 <script>
-let signupMode=false;
+let signupMode = false;
 
 function toast(msg){
-let x=document.getElementById("toast");
-x.textContent=msg;
-x.style.display="block";
-clearTimeout(window.tt);
-window.tt=setTimeout(()=>x.style.display="none",2600);
+  const x = document.getElementById("toast");
+  x.textContent = msg;
+  x.style.display = "block";
+
+  clearTimeout(window.tt);
+  window.tt = setTimeout(() => {
+    x.style.display = "none";
+  }, 2600);
 }
 
+/* ================= AUTH ================= */
+
 function openAuth(){
-document.getElementById("authModal").style.display="flex";
+  document.getElementById("authModal").style.display = "flex";
 }
 
 function closeAuth(){
-document.getElementById("authModal").style.display="none";
+  document.getElementById("authModal").style.display = "none";
 }
 
 function toggleAuth(){
-signupMode=!signupMode;
+  signupMode = !signupMode;
 
-document.getElementById("authTitle").textContent=
-signupMode?"Create GameArena Account":"Login to GameArena";
+  document.getElementById("authTitle").textContent =
+    signupMode ? "Create GameArena Account" : "Login to GameArena";
 
-document.getElementById("authBtn").textContent=
-signupMode?"Create Account":"Login";
+  document.getElementById("authBtn").textContent =
+    signupMode ? "Create Account" : "Login";
 
-document.getElementById("authName").style.display=
-signupMode?"block":"none";
+  document.getElementById("authName").style.display =
+    signupMode ? "block" : "none";
 
-document.getElementById("switchText").textContent=
-signupMode?"Already have an account?":"Don't have an account?";
+  document.getElementById("switchText").textContent =
+    signupMode
+      ? "Already have an account?"
+      : "Don't have an account?";
 
-document.getElementById("switchBtn").textContent=
-signupMode?"Login":"Sign Up";
+  document.getElementById("switchBtn").textContent =
+    signupMode ? "Login" : "Sign Up";
+
+  document.getElementById("authName").value = "";
+  document.getElementById("authEmail").value = "";
+  document.getElementById("authPassword").value = "";
 }
 
 function submitAuth(){
 
-let name=document.getElementById("authName").value.trim();
-let email=document.getElementById("authEmail").value.trim();
-let password=document.getElementById("authPassword").value;
+  const name =
+    document.getElementById("authName").value.trim();
 
-if(!email||!password||(signupMode&&!name)){
-toast("Please fill all details");
-return;
-}
+  const email =
+    document.getElementById("authEmail").value.trim().toLowerCase();
 
-let users=JSON.parse(localStorage.getItem("gamearena_users")||"[]");
+  const password =
+    document.getElementById("authPassword").value;
 
-if(signupMode){
+  if(!email || !password || (signupMode && !name)){
+    toast("Please fill all details");
+    return;
+  }
 
-if(users.some(u=>u.email===email)){
-toast("Account already exists");
-return;
-}
-
-users.push({name:name,email:email,password:password});
-
-localStorage.setItem("gamearena_users",JSON.stringify(users));
-
-toast("Account created successfully 🎉");
-
-setTimeout(()=>{
-toggleAuth();
-},700);
-
-}else{
-
-let user=users.find(u=>u.email===email&&u.password===password);
-
-if(!user){
-toast("Invalid email or password");
-return;
-}
-
-localStorage.setItem("gamearena_current_user",JSON.stringify(user));
-
-closeAuth();
-updateUserArea();
-  toast("Welcome "+user.name+" 🎮");
-}
-}
-function updateUserArea(){
-  const user = localStorage.getItem("gamearena_current_user");
-
-  if(!user) return;
-
-  const data = JSON.parse(user);
-
-  const loginBtn = document.querySelector(
-    'button[onclick="openAuth()"]'
+  let users = JSON.parse(
+    localStorage.getItem("gamearena_users") || "[]"
   );
 
-  if(loginBtn){
-    loginBtn.textContent = "👤 " + data.name;
-    loginBtn.onclick = function(){
-    showProfile();  
+  /* SIGN UP */
+  if(signupMode){
+
+    if(users.some(u => u.email === email)){
+      toast("Account already exists");
+      return;
+    }
+
+    const newUser = {
+      name: name,
+      email: email,
+      password: password
     };
+
+    users.push(newUser);
+
+    localStorage.setItem(
+      "gamearena_users",
+      JSON.stringify(users)
+    );
+
+    toast("Account created successfully 🎉");
+
+    setTimeout(() => {
+
+      signupMode = false;
+
+      document.getElementById("authTitle").textContent =
+        "Login to GameArena";
+
+      document.getElementById("authBtn").textContent =
+        "Login";
+
+      document.getElementById("authName").style.display =
+        "none";
+
+      document.getElementById("switchText").textContent =
+        "Don't have an account?";
+
+      document.getElementById("switchBtn").textContent =
+        "Sign Up";
+
+      document.getElementById("authName").value = "";
+      document.getElementById("authEmail").value = email;
+      document.getElementById("authPassword").value = "";
+
+    },700);
+
+    return;
   }
-}
-function showProfile(){
-  const user = localStorage.getItem("gamearena_current_user");
+
+  /* LOGIN */
+
+  const user = users.find(
+    u => u.email === email && u.password === password
+  );
 
   if(!user){
+    toast("Invalid email or password");
+    return;
+  }
+
+  localStorage.setItem(
+    "gamearena_current_user",
+    JSON.stringify(user)
+  );
+
+  closeAuth();
+  updateUserArea();
+
+  toast("Welcome " + user.name + " 🎮");
+}
+
+/* ================= USER AREA ================= */
+
+function updateUserArea(){
+
+  const area = document.getElementById("userArea");
+
+  const saved =
+    localStorage.getItem("gamearena_current_user");
+
+  if(!saved){
+
+    area.innerHTML =
+      '<button class="btn" onclick="openAuth()">Login</button>';
+
+    return;
+  }
+
+  const user = JSON.parse(saved);
+
+  area.innerHTML =
+    '<button class="btn" onclick="showProfile()">👤 ' +
+    user.name +
+    '</button>';
+}
+
+/* ================= PROFILE ================= */
+
+function showProfile(){
+
+  const saved =
+    localStorage.getItem("gamearena_current_user");
+
+  if(!saved){
     openAuth();
     return;
   }
 
-  const data = JSON.parse(user);
+  const user = JSON.parse(saved);
 
   const registrations = JSON.parse(
     localStorage.getItem("gamearena_registrations") || "[]"
   );
 
-  const myRegistrations = registrations.filter(
-    r => r.email === data.email
-  );
+  const myRegistrations =
+    registrations.filter(r => r.email === user.email);
 
   let tournaments = myRegistrations.length
     ? myRegistrations.map(
@@ -343,8 +410,8 @@ function showProfile(){
 
   const choice = confirm(
     "👤 PROFILE\n\n" +
-    "Username: " + data.name + "\n" +
-    "Email: " + data.email + "\n\n" +
+    "Username: " + user.name + "\n" +
+    "Email: " + user.email + "\n\n" +
     "🏆 Registered Tournaments: " +
     myRegistrations.length +
     "\n\n" +
@@ -356,115 +423,122 @@ function showProfile(){
     logoutUser();
   }
 }
-  }
-}
 
 function logoutUser(){
+
   localStorage.removeItem("gamearena_current_user");
+
   updateUserArea();
+
   toast("Logged out successfully 👋");
 }
-  function register(name){
 
-if(!localStorage.getItem("gamearena_current_user")){
-toast("Please login first");
-openAuth();
-return;
-}
+/* ================= TOURNAMENT ================= */
 
-let list=JSON.parse(localStorage.getItem("gamearena_regs")||"[]");
+function register(name){
 
-if(!list.includes(name))list.push(name);
-
-localStorage.setItem("gamearena_regs",JSON.stringify(list));
-
-toast("Registered for "+name+" 🎮");
-
-
-  const area = document.getElementById("userArea");
-  const saved = localStorage.getItem("gamearena_current_user");
+  const saved =
+    localStorage.getItem("gamearena_current_user");
 
   if(!saved){
-    area.innerHTML =
-      '<button class="btn" onclick="openAuth()">Login</button>';
-    return;
-  }
 
-  const user = JSON.parse(saved);
-
-  area.innerHTML =
-    '<span style="margin-right:10px;color:#aab4cf">👤 ' +
-    user.name +
-    '</span>' +
-    '<button class="btn" onclick="logout()">Logout</button>';
-}
-
-function logout(){
-
-  localStorage.removeItem("gamearena_current_user");
-
-  updateUserArea();
-
-  toast("Logged out successfully");
-}
-
-updateUserArea();
-function register(name){
-  const user = localStorage.getItem("gamearena_current_user");
-
-  if(!user){
     toast("Please login first");
+
     openAuth();
+
     return;
   }
 
   document.getElementById("regTitle").textContent =
     "Register: " + name;
 
-  document.getElementById("regModal").dataset.tournament = name;
+  document.getElementById("regModal")
+    .dataset.tournament = name;
 
-  document.getElementById("regModal").style.display = "flex";
+  document.getElementById("regModal")
+    .style.display = "flex";
 }
 
 function closeReg(){
-  document.getElementById("regModal").style.display = "none";
+
+  document.getElementById("regModal")
+    .style.display = "none";
 }
 
 function submitRegistration(){
 
   const playerName =
-    document.getElementById("playerName").value.trim();
+    document.getElementById("playerName")
+      .value.trim();
 
   const playerUid =
-    document.getElementById("playerUid").value.trim();
+    document.getElementById("playerUid")
+      .value.trim();
 
   const mode =
     document.getElementById("playerMode").value;
 
   const tournament =
-    document.getElementById("regModal").dataset.tournament;
+    document.getElementById("regModal")
+      .dataset.tournament;
 
   if(!playerName || !playerUid || !mode){
+
     toast("Please fill all details");
+
     return;
   }
+
+  const saved =
+    localStorage.getItem("gamearena_current_user");
+
+  if(!saved){
+
+    toast("Please login first");
+
+    closeReg();
+    openAuth();
+
+    return;
+  }
+
+  const user = JSON.parse(saved);
 
   let registrations = JSON.parse(
     localStorage.getItem("gamearena_registrations") || "[]"
   );
 
-  const user = JSON.parse(
-    localStorage.getItem("gamearena_current_user")
+  /* Prevent duplicate registration */
+
+  const alreadyRegistered = registrations.some(
+    r =>
+      r.email === user.email &&
+      r.tournament === tournament
   );
 
+  if(alreadyRegistered){
+
+    toast("You already registered for this tournament");
+
+    return;
+  }
+
   registrations.push({
+
     tournament: tournament,
+
     username: user.name,
+
     email: user.email,
+
     playerName: playerName,
+
     uid: playerUid,
+
     mode: mode,
+
     date: new Date().toLocaleString()
+
   });
 
   localStorage.setItem(
@@ -480,7 +554,13 @@ function submitRegistration(){
 
   toast("Registration successful 🎉");
 }
+
+/* ================= START ================= */
+
+updateUserArea();
+
 </script>
+
 <div class="modal" id="regModal">
   <div class="modal-box">
     <button class="close" onclick="closeReg()">×</button>
