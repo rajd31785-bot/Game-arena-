@@ -81,7 +81,7 @@ h1{font-size:42px}
 
 <div id="userArea">
   <button class="btn" onclick="openAuth()">Login</button>
-<button class="btn alt" onclick="openAdmin()">Admin</button>
+
 </div>
 </div>
 </header>
@@ -368,18 +368,26 @@ function updateUserArea(){
 
   if(!saved){
 
-    area.innerHTML =
-      '<button class="btn" onclick="openAuth()">Login</button>';
+    area.innerHTML = `
+      <button class="btn" onclick="openAuth()">Login</button>
+      <button class="btn alt" onclick="openAdmin()">Admin</button>
+    `;
 
     return;
   }
 
   const user = JSON.parse(saved);
 
-  area.innerHTML =
-    '<button class="btn" onclick="showProfile()">👤 ' +
-    user.name +
-    '</button>';
+  area.innerHTML = `
+    <button class="btn" onclick="showProfile()">
+      👤 ${user.name}
+    </button>
+
+    <button class="btn alt" onclick="openAdmin()">
+      Admin
+    </button>
+  `;
+}
 }
 
 /* ================= PROFILE ================= */
