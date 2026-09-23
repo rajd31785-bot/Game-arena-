@@ -81,6 +81,7 @@ h1{font-size:42px}
 
 <div id="userArea">
   <button class="btn" onclick="openAuth()">Login</button>
+<button class="btn alt" onclick="openAdmin()">Admin</button>
 </div>
 </div>
 </header>
@@ -586,5 +587,131 @@ updateUserArea();
     </button>
   </div>
 </div>
+<div class="modal" id="adminModal">
+  <div class="modal-box" style="max-width:900px;max-height:90vh;overflow:auto">
+
+    <button class="close" onclick="closeAdmin()">×</button>
+
+    <h2>🛡️ Admin Panel</h2>
+
+    <div id="adminStats"></div>
+
+    <input
+      class="input"
+      id="adminSearch"
+      placeholder="Search player, UID or tournament..."
+      oninput="loadRegistrations()"
+    >
+
+    <div id="adminRegistrations"></div>
+
+  </div>
+</div>
+
+<script>
+
+function openAdmin(){
+
+  const password = prompt("Enter Admin Password:");
+
+  if(password !== "admin123"){
+    toast("Wrong admin password ❌");
+    return;
+  }
+
+  document.getElementById("adminModal").style.display = "flex";
+
+  loadRegistrations();
+}
+
+function closeAdmin(){
+
+  document.getElementById("adminModal").style.display = "none";
+
+}
+
+function loadRegistrations(){
+
+  const registrations = JSON.parse(
+    localStorage.getItem("gamearena_registrations") || "[]"
+  );
+
+  const search =
+    (document.getElementById("adminSearch")?.value || "")
+    .toLowerCase();
+
+  const filtered = registrations.filter(r =>
+    r.playerName.toLowerCase().includes(search) ||
+    r.uid.toLowerCase().includes(search) ||
+    r.tournament.toLowerCase().includes(search) ||
+    r.email.toLowerCase().includes(search)
+  );
+
+  document.getElementById("adminStats").innerHTML = `
+    <div class="card" style="margin-bottom:15px">
+      <h3>📊 Total Registrations</h3>
+      <div class="big">${registrations.length}</div>
+    </div>
+  `;
+
+  if(filtered.length === 0){
+
+    document.getElementById("adminRegistrations").innerHTML =
+      "<p class='muted'>No registrations found.</p>";
+
+    return;
+  }
+
+  document.getElementById("adminRegistrations").innerHTML =
+    filtered.map((r,index) => `
+
+      <div class="card" style="margin-bottom:12px">
+
+        <div class="tag">${r.tournament}</div>
+
+        <h3>${r.playerName}</h3>
+
+        <p>
+          🎮 UID: <b>${r.uid}</b><br>
+          👤 Mode: <b>${r.mode}</b><br>
+          📧 Email: ${r.email}<br>
+          🕒 ${r.date}
+        </p>
+
+        <button
+          class="btn"
+          onclick="deleteRegistration(${registrations.indexOf(r)})"
+          style="background:#c93636">
+          Delete
+        </button>
+
+      </div>
+
+    `).join("");
+}
+
+function deleteRegistration(index){
+
+  if(!confirm("Delete this registration?")){
+    return;
+  }
+
+  let registrations = JSON.parse(
+    localStorage.getItem("gamearena_registrations") || "[]"
+  );
+
+  registrations.splice(index,1);
+
+  localStorage.setItem(
+    "gamearena_registrations",
+    JSON.stringify(registrations)
+  );
+
+  loadRegistrations();
+
+  toast("Registration deleted");
+}
+
+</script>
 </body>
 </html>
